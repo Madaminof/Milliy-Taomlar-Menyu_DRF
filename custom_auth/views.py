@@ -4,6 +4,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from rest_framework.views import APIView
+from flask import Flask, request, jsonify, app
+
 
 
 from rest_framework import generics, permissions
@@ -92,11 +94,6 @@ class SavatRetrieweUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = BuyurtmaSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-
-
-
-from flask import Flask, request, jsonify, app
-
 app = Flask(__name__)
 
 # Bu yerda buyurtmalar ro'yxati saqlanadi
@@ -128,6 +125,5 @@ def receive_order():
 def exit_program():
     return jsonify({'message': 'Dasturdan muvaffaqiyatli chiqildi'}), 200
 
-if name == '__main__':
-    app.run(debug=True)
+
 
