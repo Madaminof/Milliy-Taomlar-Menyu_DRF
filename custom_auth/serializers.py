@@ -5,6 +5,7 @@ from custom_auth.models import Taom, Buyurtma
 from rest_framework.decorators import action
 from django.db.transaction import atomic
 
+
 User = get_user_model()
 
 
@@ -53,13 +54,17 @@ class BuyurtmaSerializer(serializers.ModelSerializer):
         instance.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
+
     @action(detail=True, methods=['GET'])
     def liked(self, request, *args, **kwargs):
         buyurtma = self.get_object()
         with atomic():
             buyurtma.likes += 1
             buyurtma.save()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+        return Response({'message': 'Buyurtma liked successfully', 'likes': buyurtma.likes}, status=status.HTTP_200_OK)
 
 
 
