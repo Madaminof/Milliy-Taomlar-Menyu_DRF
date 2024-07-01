@@ -2,6 +2,8 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers, status
 from rest_framework.response import Response
 from custom_auth.models import Taom, Buyurtma
+from rest_framework.decorators import action
+from django.db.transaction import atomic
 
 User = get_user_model()
 
@@ -36,7 +38,7 @@ class TaomSerializer(serializers.ModelSerializer):
 class BuyurtmaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Buyurtma
-        fields = ['id', 'foydalanuvchi', 'taom', 'quantity', 'buyurtma_sanasi', 'manzil', 'tolov_usuli']
+        fields = ['id', 'foydalanuvchi', 'taom', 'quantity', 'buyurtma_sanasi', 'manzil', 'tolov_usuli','likes']
         read_only_fields = ['foydalanuvchi']
 
     def create(self, validated_data):
@@ -50,4 +52,14 @@ class BuyurtmaSerializer(serializers.ModelSerializer):
     def delete(self,instance):
         instance.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=True, methods=['GET'])
+    def liked(self, request, *args, **kwargs):
+        buyurtma = self.get_object()
+        with atomic():
+            buyurtma.likes += 1
+            buyurtma.save()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 

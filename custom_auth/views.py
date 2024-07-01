@@ -58,6 +58,11 @@ class BuyurtmaCreateAPIView(generics.CreateAPIView):
     serializer_class = BuyurtmaSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+class BuyurtmaListAPiView(generics.ListAPIView):
+    queryset = Buyurtma.objects.all()
+    serializer_class = BuyurtmaSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
 
 # Savat ko'rish
 class SavatchaListAPIView(generics.ListAPIView):

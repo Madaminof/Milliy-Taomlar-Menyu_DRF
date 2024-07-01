@@ -3,7 +3,7 @@ from django.conf.urls.static import static
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 from .views import UserCreate, ObtainTokenPairWithUserView, UserDetail, TaomListAPIView, BuyurtmaCreateAPIView, \
-    SavatRetrieweUpdateDestroyAPIView, SavatchaListAPIView
+    SavatRetrieweUpdateDestroyAPIView, SavatchaListAPIView,BuyurtmaListAPiView
 
 urlpatterns = [
     #auth
@@ -17,6 +17,9 @@ urlpatterns = [
     # menyu va buyurtma
     path('api/taomlar/', TaomListAPIView.as_view(), name='taomlar-list'),
     path('api/buyurtma/', BuyurtmaCreateAPIView.as_view(), name='buyurtma-create'),
+    path('api/buyurtmalar/<int:id>/', BuyurtmaListAPiView.as_view(), name='buyurtmalar-list'),
+
+
 
     # savatcha
     path('api/savatcha/', SavatchaListAPIView.as_view(), name='savatcha-list'),
