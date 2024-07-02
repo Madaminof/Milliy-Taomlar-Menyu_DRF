@@ -22,8 +22,6 @@ urlpatterns = [
     path('buyurtmalar/<int:order_id>/accept/', accept_order, name='accept_order'),
     path('buyurtmalar/rate/', rate_order, name='rate_order'),
 
-
-
     # savatcha
     path('api/savatcha/', SavatchaListAPIView.as_view(), name='savatcha-list'),
     path('api/savatcha-update-delete/<int:pk>/', SavatRetrieweUpdateDestroyAPIView.as_view(), name='savatcha-detail'),
