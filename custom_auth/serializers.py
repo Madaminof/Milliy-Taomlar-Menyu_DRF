@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers, status
 from rest_framework.response import Response
-from custom_auth.models import Taom, Buyurtma
+from custom_auth.models import Taom, Buyurtma, Rating
 from rest_framework.decorators import action
 from django.db.transaction import atomic
 
@@ -67,4 +67,7 @@ class BuyurtmaSerializer(serializers.ModelSerializer):
         return Response({'message': 'Buyurtma liked successfully', 'likes': buyurtma.likes}, status=status.HTTP_200_OK)
 
 
-
+class RatingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Rating
+        fields = ['buyurtma', 'food_quality', 'service_quality']

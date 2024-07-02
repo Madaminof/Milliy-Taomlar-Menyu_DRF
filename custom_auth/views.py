@@ -1,19 +1,19 @@
-from nltk import app
+from rest_framework.decorators import api_view
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from rest_framework.views import APIView
-from flask import Flask, request, jsonify, app
 
 
 
-from rest_framework import generics, permissions
+
+from rest_framework import generics, permissions, status
 from rest_framework.permissions import AllowAny
 from .models import Taom, Buyurtma
 from .serializers import TaomSerializer, BuyurtmaSerializer
 
-from .serializers import UserSerializer, UserDetailSerializer
+from .serializers import UserSerializer, UserDetailSerializer,RatingSerializer
 
 User = get_user_model()
 
@@ -60,25 +60,50 @@ class BuyurtmaCreateAPIView(generics.CreateAPIView):
     serializer_class = BuyurtmaSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    @app.route('/submit_order', methods=['POST'])
-    def submit_order():
-        data = request.get_json()
-        orders.append(data)
-        estimated_delivery_time = estimate_delivery_time(data)
-        return jsonify({'message': 'Buyurtma tasdiqlandi va qabul qilindi',
-                        'estimated_delivery_time': estimated_delivery_time}), 200
-
-    def estimate_delivery_time(order_data):
-        # Bu funksiya orqali yetkazib berish vaqti taxmin qilingan bo'lishi kerak
-        return "2 kun ichida"
 
 
-
-
+#Buyurtmalar royhatini ko'rish
 class BuyurtmaListAPiView(generics.ListAPIView):
     queryset = Buyurtma.objects.all()
     serializer_class = BuyurtmaSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+#Buyurtmani tasdiqlash
+
+@api_view(['POST'])
+def buyurtma_tasdiqlash(request):
+    serializer = BuyurtmaSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(
+            {
+                'message': 'Sizning buyurtmangiz 20-30 daqiqada yetkazib beriladi',
+                'data': serializer.data
+            },
+            status=status.HTTP_201_CREATED
+        )
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+def accept_order(request,order_id):
+    try:
+        buyurtma = Buyurtma.objects.filter(id=order_id)
+        buyurtma.status = 'accepted'
+        buyurtma.save()
+        return Response({'message': 'Buyurtma qabul qilindi'}, status=status.HTTP_200_OK)
+    except Buyurtma.DoesNotExist:
+        return Response({'error': 'Buyurtma topilmadi'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['POST'])
+def rate_order(request):
+    serializer = RatingSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response({'message': 'Reytingingiz uchun rahmat'}, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 # Savat ko'rish
@@ -93,37 +118,5 @@ class SavatRetrieweUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Buyurtma.objects.all()
     serializer_class = BuyurtmaSerializer
     permission_classes = [permissions.IsAuthenticated]
-
-app = Flask(__name__)
-
-# Bu yerda buyurtmalar ro'yxati saqlanadi
-orders = []
-
-# 6. Buyurtmani tasdiqlash va jo'natish
-@app.route('/submit_order', methods=['POST'])
-def submit_order():
-    data = request.get_json()
-    orders.append(data)
-    estimated_delivery_time = estimate_delivery_time(data)
-    return jsonify({'message': 'Buyurtma tasdiqlandi va qabul qilindi', 'estimated_delivery_time': estimated_delivery_time}), 200
-
-def estimate_delivery_time(order_data):
-    # Bu funksiya orqali yetkazib berish vaqti taxmin qilingan bo'lishi kerak
-    return "2 kun ichida"
-
-# 7. Buyurtmani qabul qilish va baholash
-@app.route('/receive_order', methods=['POST'])
-def receive_order():
-    data = request.get_json()
-    # Bu erda buyurtmani qabul qilib, taom sifati va xizmat darajasini baholaymiz
-    quality_rating = data.get('quality_rating')
-    service_rating = data.get('service_rating')
-    return jsonify({'message': 'Buyurtma qabul qilindi va baholandi', 'quality_rating': quality_rating, 'service_rating': service_rating}), 200
-
-# 8. Chiqish
-@app.route('/exit', methods=['GET'])
-def exit_program():
-    return jsonify({'message': 'Dasturdan muvaffaqiyatli chiqildi'}), 200
-
 
 

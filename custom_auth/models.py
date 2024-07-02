@@ -27,7 +27,13 @@ class Buyurtma(models.Model):
     buyurtma_sanasi = models.DateTimeField(auto_now_add=True)
     manzil = models.CharField(max_length=255, blank=True, null=True)
     tolov_usuli = models.CharField(max_length=50, blank=True, null=True)
-    likes = models.PositiveBigIntegerField(default=0)
+    status = models.CharField(max_length=50, default='pending')
+
+class Rating(models.Model):
+    buyurtma = models.ForeignKey(Buyurtma, on_delete=models.CASCADE)
+    food_quality = models.IntegerField()
+    service_quality = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ('id',)
