@@ -39,7 +39,7 @@ class TaomSerializer(serializers.ModelSerializer):
 class BuyurtmaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Buyurtma
-        fields = ['id', 'foydalanuvchi', 'taom', 'quantity', 'buyurtma_sanasi', 'manzil', 'tolov_usuli','status']
+        fields = ['id', 'foydalanuvchi', 'taom', 'quantity', 'buyurtma_sanasi', 'manzil', 'tolov_usuli', 'status']
         read_only_fields = ['foydalanuvchi']
 
     def create(self, validated_data):
@@ -50,7 +50,7 @@ class BuyurtmaSerializer(serializers.ModelSerializer):
         validated_data['foydalanuvchi'] = self.context['request'].user
         return super().update(instance, validated_data)
 
-    def delete(self,instance):
+    def delete(self, instance):
         instance.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 

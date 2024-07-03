@@ -72,28 +72,24 @@ class BuyurtmaListAPiView(generics.ListAPIView):
 
 @api_view(['POST'])
 def buyurtma_tasdiqlash(request):
-    serializer = BuyurtmaSerializer(data=request.data)
+    serializer = BuyurtmaSerializer(data=request.data, context={'request': request})
     if serializer.is_valid():
         serializer.save()
-        return Response(
-            {
-                'message': 'Sizning buyurtmangiz 20-30 daqiqada yetkazib beriladi',
-                'data': serializer.data
-            },
-            status=status.HTTP_201_CREATED
-        )
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
-def accept_order(request,order_id):
+def accept_order(request, pk):
     try:
-        buyurtma = Buyurtma.objects.filter(id=order_id)
-        buyurtma.status = 'accepted'
-        buyurtma.save()
-        return Response({'message': 'Buyurtma qabul qilindi'}, status=status.HTTP_200_OK)
+        buyurtma = Buyurtma.objects.get(pk=pk)
     except Buyurtma.DoesNotExist:
-        return Response({'error': 'Buyurtma topilmadi'}, status=status.HTTP_404_NOT_FOUND)
+        return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    buyurtma.status = 'accepted'
+    buyurtma.save()
+
+    return Response({'status': 'Order accepted'}, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
