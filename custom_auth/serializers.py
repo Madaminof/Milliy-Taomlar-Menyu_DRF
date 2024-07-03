@@ -39,7 +39,7 @@ class TaomSerializer(serializers.ModelSerializer):
 class BuyurtmaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Buyurtma
-        fields = ['id', 'foydalanuvchi', 'taom', 'quantity', 'buyurtma_sanasi', 'manzil', 'tolov_usuli','likes']
+        fields = ['id', 'foydalanuvchi', 'taom', 'quantity', 'buyurtma_sanasi', 'manzil', 'tolov_usuli','status']
         read_only_fields = ['foydalanuvchi']
 
     def create(self, validated_data):
